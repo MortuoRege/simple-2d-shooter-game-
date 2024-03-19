@@ -43,7 +43,7 @@ void Game::run()
 
 void Game::setPaused(bool paused)
 {
-	m_paused = paused;w
+	m_paused = paused;
 }
 
 void Game::spawnPlayer()
@@ -142,6 +142,34 @@ void Game::spawnBullet(std::shared_ptr<Entity> entity, const Vec2& mouseposition
 
 void Game::spawnSpecialWeapon(std::shared_ptr<Entity> entity)
 {
+
+	// I like to call this scpecial weapon the black hole weapon
+	//basicallly it will pull all the enemies towards it and player will be able to shoot them easily
+	
+	//player will only be able to shoot the special weapon after 1000 frames
+	if (m_currentFrame - m_lastSpecialWeaponSpawnTime < 1000)
+	{
+		return;
+	}
+
+	auto specialWeapon = m_entities.addEntity("specialWeapon");
+
+	specialWeapon->cTransform = std::make_shared<CTransform>(entity->cTransform->pos, Vec2(0, 0), 0);
+
+	specialWeapon->cShape = std::make_shared<CShape>(40, 15, sf::Color(0, 0, 0), sf::Color(255, 255, 255), 5);
+	specialWeapon->cLifespan = std::make_shared<CLifeSpan>(225);
+	specialWeapon->cCollision = std::make_shared<CCollision>(40);
+
+	float centerX = m_window.getSize().x / 2.0f;
+	float centerY = m_window.getSize().y / 2.0f;
+
+	Vec2 centerPos(centerX, centerY);
+	Vec2 dist = centerPos - entity->cTransform->pos; // Vector pointing from entity to center
+
+	dist.normalize();
+	specialWeapon->cTransform->velocity = dist * 10.0f;
+
+	m_lastSpecialWeaponSpawnTime = m_currentFrame;
 	
 }
 
@@ -192,6 +220,35 @@ void Game::sMovement()
 	{
 		e->cTransform->pos.x += e->cTransform->velocity.x;
 		e->cTransform->pos.y += e->cTransform->velocity.y;
+	}
+
+	for (auto& e : m_entities.getEntities("specialWeapon"))
+	{
+		e->cTransform->pos.x += e->cTransform->velocity.x;
+		e->cTransform->pos.y += e->cTransform->velocity.y;
+
+		float centerX = m_window.getSize().x / 2.0f;
+		float centerY = m_window.getSize().y / 2.0f;
+
+		float distanceToCenter = std::sqrt(std::pow(e->cTransform->pos.x - centerX, 2) + std::pow(e->cTransform->pos.y - centerY, 2));
+
+		if (distanceToCenter < 7.0f) // If the special weapon is close enough to the center
+		{
+			e->cTransform->velocity.x = 0;
+			e->cTransform->velocity.y = 0;
+			
+			for (auto& e2 : m_entities.getEntities("enemy"))
+			{
+				Vec2 v1(e->cTransform->pos.x, e->cTransform->pos.y);
+				Vec2 v2(e2->cTransform->pos.x, e2->cTransform->pos.y);
+				Vec2 dist = v1 - v2;
+				dist.normalize();
+				e2->cTransform->velocity = dist * 5.0f;
+
+				
+			}
+		}
+		
 	}
 
 	
@@ -254,6 +311,20 @@ void Game::sLifeSpan()
 
 		}
 	}
+
+	for (auto& e : m_entities.getEntities("specialWeapon"))
+	{
+		if (e->cLifespan)
+		{
+			e->cLifespan->remaining -= 0.5;
+			if (e->cLifespan->remaining <= 0)
+			{
+				e->destroy();
+				m_activeWeapon = false;
+				continue;
+			}
+		}
+	}	
 
 }
 
@@ -398,6 +469,8 @@ void Game::sRender()
 		e->cTransform->angle += 1.0f;
 		e->cShape->circle.setRotation(e->cTransform->angle);
 		m_window.draw(e->cShape->circle);
+
+		std::cout << m_currentFrame - m_lastSpecialWeaponSpawnTime << std::endl;
 	}
 
 	if (!m_font.loadFromFile("Fonts/arial.ttf")) // replace with the path to your font file
@@ -413,7 +486,26 @@ void Game::sRender()
 	m_text.setFillColor(sf::Color::White); // Set the fill color
 	m_text.setPosition(10.f, 10.f); // Set the position (top-left corner)
 	m_window.draw(m_text);
+
+	if (m_currentFrame - m_lastSpecialWeaponSpawnTime >= 1000)
+	{
+		// If it has, the player is able to shoot the special weapon
+		m_activeWeapon = true;
+	}
+
+	std::string weaponStatus;
+
+	m_activeWeapon ? weaponStatus = "online\n" : weaponStatus = "offline\n";
+	std::string weaponString = "The special weapon is: " + weaponStatus;
+	m_text.setString(weaponString); // Set the string to display
+	m_text.setCharacterSize(24); // Set the character size
+	m_text.setFillColor(sf::Color::White); // Set the fill color
+	m_text.setPosition(10.f, 40.f); // Set the position (top-left corner)
+	m_window.draw(m_text);
+
+
 	m_window.display();
+	
 }
 
 
@@ -476,6 +568,8 @@ void Game::sUserInput()
 			case sf::Keyboard::A:
 				m_player->cInput->left = false;
 				break;
+			case sf::Keyboard::Space:
+				spawnSpecialWeapon(m_player);
 			default:
 				break;
 

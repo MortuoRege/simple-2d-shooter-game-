@@ -14,8 +14,10 @@ class Game
 	int m_score = 0;
 	int m_currentFrame = 0;
 	int m_lastEnemyspawnTime = 0;
+	int m_lastSpecialWeaponSpawnTime = 0;
 	bool m_paused = false;
 	bool m_running = true;
+	bool m_activeWeapon = false;
 
 	std::shared_ptr<Entity> m_player;
 
