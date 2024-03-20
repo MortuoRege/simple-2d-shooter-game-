@@ -1,9 +1,9 @@
 ## <p align="center">**OVERVIEW**</p>
 
-this is a simple 2D shooter game made in C++ using SFML graphics library and ECS(Entity, Components, Systems) <br>
+this is a simple 2D shooter game made in C++ using SFML graphics library and ECS(Entity, Components, Systems) design pattern <br>
 
 **objective**<br>
-objective of the game is to get as many point as possible without dying
+the objective of the game is to get as many points as possible without dying
 
 ## <p align="center">**INSTALLATION**</p>
 clone repository to your local machine using<br> git clone https://github.com/MortuoRege/simple-2d-shooter-game-.git<br> Open the project in Visual Studio Build the project, run the executable file generated,
