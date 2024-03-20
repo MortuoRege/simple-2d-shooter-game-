@@ -26,6 +26,6 @@ public:
 
 
 	float dist(Vec2& v) const; //distance between two points
-	float normalize();
+	void normalize();
 	Vec2 getposition();
 };

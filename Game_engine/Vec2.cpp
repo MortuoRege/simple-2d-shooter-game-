@@ -70,7 +70,7 @@ float Vec2::dist(Vec2& v) const
 	return std::sqrt((v.x - x) * (v.x - x) + (v.y - y) * (v.y - y));
 }
 
-float Vec2::normalize() 
+void Vec2::normalize() 
 {
 	float length = std::sqrt(x * x + y *y);
 	if (length != 0)
@@ -78,7 +78,6 @@ float Vec2::normalize()
 		x /= length;
 		y /= length;
 	}
-	return length;
 }
 
 Vec2 Vec2::getposition()
