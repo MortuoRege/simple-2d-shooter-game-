@@ -472,7 +472,7 @@ void Game::sRender()
 		m_window.draw(e->cShape->circle);
 	}
 
-	if (!m_font.loadFromFile("Fonts/arial.ttf")) // replace with the path to your font file
+	if (!m_font.loadFromFile("arial.ttf")) // replace with the path to your font file
 	{
 		// handle error
 	}
