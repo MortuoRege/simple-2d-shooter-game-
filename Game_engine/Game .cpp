@@ -469,8 +469,6 @@ void Game::sRender()
 		e->cTransform->angle += 1.0f;
 		e->cShape->circle.setRotation(e->cTransform->angle);
 		m_window.draw(e->cShape->circle);
-
-		std::cout << m_currentFrame - m_lastSpecialWeaponSpawnTime << std::endl;
 	}
 
 	if (!m_font.loadFromFile("Fonts/arial.ttf")) // replace with the path to your font file
@@ -555,7 +553,6 @@ void Game::sUserInput()
 			switch (event.key.code)
 			{
 			case sf::Keyboard::W:
-				std::cout << "W key realised\n";
 				//set player input component up to false 
 				m_player->cInput->up = false;
 				break;
